@@ -143,7 +143,10 @@ export default function StumblePage() {
     setError(null);
 
     try {
-      const res = await fetch("/api/next", {
+      // In production this app is mounted at /bumbleupon, so hit the
+      // basePath-prefixed API route. Locally (no basePath) this still works
+      // because Next will serve /bumbleupon/api/next as well.
+      const res = await fetch("/bumbleupon/api/next", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ visitorId, mode }),

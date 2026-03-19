@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
+  // Serve the app under /bumbleupon instead of /
+  basePath: "/bumbleupon",
 };
 
 export default nextConfig;
