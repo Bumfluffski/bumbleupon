@@ -168,8 +168,9 @@ export async function POST(req: Request) {
     {
       const { data: links, error: linksError } = await supabase
         .from("links")
-        // Include both `description` (snake/modern) and `Notes` (your schema).
-        .select('id, url, title, description, "Notes", created_at')
+        // Keep this select conservative across schemas.
+        // `description` can be absent in some DBs; `Notes` is the current source.
+        .select('id, url, title, "Notes", created_at')
         .eq("status", "active");
 
       if (linksError) {
@@ -243,7 +244,9 @@ export async function POST(req: Request) {
             .filter((l): l is LinkRow => Boolean(l));
         }
       } else {
-        typedLinks = (links ?? []) as LinkRow[];
+        typedLinks = (links ?? [])
+          .map((row) => toLinkRow(row as Record<string, unknown>))
+          .filter((l): l is LinkRow => Boolean(l));
       }
     }
 

@@ -13,6 +13,37 @@ export function getSupabase() {
   const supabaseAnonKey =
     process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+  // Fail loudly if we accidentally started with placeholder env values.
+  // This makes debugging deployment issues much faster.
+  const looksPlaceholder = (v: string | undefined) => {
+    if (!v) return true;
+    const s = v.toLowerCase();
+    return (
+      s.includes("...") ||
+      s.includes("<") ||
+      s.includes(">") ||
+      s.includes("your_") ||
+      s.includes("real_") ||
+      s.includes("sb_...") ||
+      s.endsWith("sb_")
+    );
+  };
+
+  if (looksPlaceholder(supabaseUrl)) {
+    throw new Error(
+      `Supabase URL appears to be a placeholder. Got: ${String(
+        supabaseUrl
+      )}`
+    );
+  }
+  if (looksPlaceholder(supabaseAnonKey)) {
+    throw new Error(
+      `Supabase anon key appears to be a placeholder. Got: ${String(
+        supabaseAnonKey
+      ).slice(0, 20)}...`
+    );
+  }
+
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
       "Missing Supabase env vars. Set SUPABASE_URL/SUPABASE_ANON_KEY (or NEXT_PUBLIC_SUPABASE_URL/NEXT_PUBLIC_SUPABASE_ANON_KEY) in .env.local"
